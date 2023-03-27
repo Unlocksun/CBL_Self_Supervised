@@ -2,9 +2,12 @@ function [] = plot_pattern(vec)
 %PLOT_PATTERN Summary of this function goes here
 %   Detailed explanation goes here
 %   vec should be a column vector
+
+vec = 1/sqrt(size(vec,1))*exp(1j*vec);
+
 My = size(vec, 1);
 over_sampling_y = 1000;
-[F,~] = UPA_codebook_generator(1,My,1,1,over_sampling_y,1,.5); %F: (#ant, #sampled_directions)
+[F,~] = UPA_codebook_generator(1,My,1,1,over_sampling_y,1,.5); %F: (#ant, #sampled_directions), arrays are deployed along axiz y
 theta_s = 0:pi/(over_sampling_y*My):pi-1e-6;
 projection = ctranspose(F)*vec;
 proj = abs(projection).^2;

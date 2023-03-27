@@ -15,6 +15,7 @@ class Model:
         self.Loss = CrossEntroy(batch_size)
         # codebook and gradient
         self.batch_size = batch_size
+            # 码字即为FC层的权重
         self.codebook = self.ComplexFC.thetas
         self.grad = self.ComplexFC.grad
 

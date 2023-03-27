@@ -15,6 +15,7 @@ class CrossEntroy:
         self.val_first = True
 
     def forward(self, prob, label, val_mode=False, val_size=100):
+        # 验证集
         if val_mode:
             if self.val_first:
                 self.count_val = 0
@@ -33,6 +34,7 @@ class CrossEntroy:
                 if self.count_val == val_size:
                     self.loss_val = (1 / val_size) * self.loss_val
                     self.val_first = True
+        # 测试集
         else:
             self.prob = prob.reshape((1, prob.size))
             self.label = label.reshape((1, label.size))

@@ -20,6 +20,7 @@ class FullyConnected:
         self.time_step = 0
 
     def thetaInit(self):
+        # 随机生成初始权重
         init_thetas = 2 * np.pi * np.random.rand(self.num_beams, self.num_ant)
         return init_thetas
 
@@ -78,6 +79,7 @@ class FullyConnected:
             self.grad = np.matmul(dydx, dxdz)
         return self.grad
 
+    # 信道估计
     def estimate(self):
         A_complex = self.A[:self.num_beams] + 1j * self.A[self.num_beams:]
         W_conj = np.conj(self.W)

@@ -7,21 +7,26 @@ from utils import bf_gain_cal, train_shuffle
 
 num_ant = 64
 num_of_beams = [64]
-load_file = './'
+
+scenario = 'O1_60_64beam'
+tr_set_file = './DataSet_npy/' + scenario + '_tr.npy'
+val_set_file = './DataSet_npy/' + scenario + '_val.npy'
 
 batch_size = 500
-epoch_schedule = [2, 3]
-lr_schedule = [0.1, 0.01]
+epoch_schedule = [2, 3]     # epoch num in different schedule
+lr_schedule = [0.1, 0.01]   # learning rate in different schedule
 
 if len(epoch_schedule) != len(lr_schedule):
     print('Reset epoch schedule and learning rate schedule.')
     sys.exit()
 
 # Input_data loading and preparation
-train_inp, val_inp = load_data(load_file)
+train_inp, val_inp = load_data(tr_set_file, val_set_file)
 
-num_train_batch = np.floor(train_inp.shape[0] / batch_size).astype('int')
-num_val_batch = np.floor(val_inp.shape[0] / batch_size).astype('int')
+
+# divide the dataset
+num_train_batch = np.floor(train_inp.shape[0] / (2*batch_size)).astype('int')
+num_val_batch = np.floor(val_inp.shape[0] / (2*batch_size)).astype('int')
 limit = num_train_batch * batch_size
 train_data = train_inp[0:limit, :]
 limit = num_val_batch * batch_size
@@ -56,7 +61,7 @@ for num_beams in num_of_beams:
             for batch_idx in range(num_train_batch):
                 grad = np.zeros([num_beams, num_ant])
                 for ch_idx in range(batch_size):
-                    channel = train_data[batch_idx * batch_size + ch_idx, :]
+                    channel = train_data[batch_idx * batch_size + ch_idx, :]    # shape(1,128)
                     net.forward(channel)
                     net.backward()
                 loss = net.Loss.loss
@@ -72,9 +77,9 @@ for num_beams in num_of_beams:
                 val_loss = net.Loss.loss_val
                 val_loss_iter.append(val_loss)
 
-                print('beam: %d, schedule: %d (%d), epoch: %d (%d), batch: %d, loss: %f, avg gain: %f, val loss: %f.' %
+                print('beam: %d, schedule: %d (%d), epoch: %d (%d), batch: %d(%d), loss: %f, avg gain: %f, val loss: %f.' %
                       (num_beams, sch_idx + 1, len(epoch_schedule), epoch_idx + 1, epoch_schedule[sch_idx],
-                       batch_idx + 1, loss, val_gain, val_loss))
+                       batch_idx + 1, num_train_batch, loss, val_gain, val_loss))
 
                 if net.codebook.dtype != 'float64':
                     ValueError('Bad thing happens!')
